@@ -37,16 +37,30 @@ def adjust_contrast(image, contrast=1.0):
     contrast_img = cv2.addWeighted(image, alpha_c, image, 0, gamma_c)
     return contrast_img
 
-if __name__ == "__main__":
+def main():
     img_path = r'C:\Users\PC\Desktop\Smart image enhancer\Smart-Image-Enhancer-Project\image1.jpg'
     image = cv2.imread(img_path)
 
-    if image is not None:
-        
-        brightness_adjusted_img = adjust_brightness(image, brightness=30)
+    if image is None:
+        print("Could not load the image.")
+        return
+    
+    user_choice = input("Do you want to adjust brightness or contrast? (Enter 'brightness' or 'contrast'): ").lower()
 
-        contrast_adjusted_img = adjust_contrast(brightness_adjusted_img, contrast=1.5)
+    if user_choice not in ['brightness', 'contrast']:
+        print("Invalid choice. Please enter 'brightness' or 'contrast'.")
+        return
+    
+    if user_choice == 'brightness':
+        value = int(input("Enter the brightness value (negative to decrease, positive to increase) (ex. -1 or 2 or 3): "))
+        adjusted_image = adjust_brightness(image, brightness=value)
+    else:
+        value = float(input("Enter the contrast value (less than 1 to decrease, greater than 1 to increase, 1 for no change): "))
+        adjusted_image = adjust_contrast(image, contrast=value)
+    
+    # Saving the enhanced image
+    cv2.imwrite('enhanced_image.jpg', adjusted_image)
+    print("Enhancement applied successfully.")
 
-        # Saving the enhanced image
-        cv2.imwrite('enhanced_image.jpg', contrast_adjusted_img)
-        print("Enhanced successfully")
+if __name__ == "__main__":
+    main()
