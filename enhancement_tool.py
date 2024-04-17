@@ -56,7 +56,7 @@ def adjust_sharpness(image):
 
 
 def main():
-    img_path = r'img.jpg'
+    img_path = r'img.png'
     image = cv2.imread(img_path)
 
     if image is None:
