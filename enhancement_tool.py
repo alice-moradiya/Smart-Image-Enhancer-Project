@@ -1,28 +1,52 @@
 import cv2
 import numpy as np
 
-def adjust_brightness_contrast(image, brightness=0, contrast=0):
-    """
-    Adjusts the brightness and contrast of an image.
-    :param image: Input image
-    :param brightness: Brightness adjustment factor
-    :param contrast: Contrast adjustment factor
-    """
-    # Convertes to float to prevent clipping issues
-    img_float = image.astype(np.float)
+def adjust_brightness(image, brightness=0):
+    if image is None:
+        raise ValueError("Invalid image provided for brightness adjustment.")
     
-    # Adjust brightness and contrast
-    img_bright_contrast = np.clip((1 + contrast / 100.0) * img_float + brightness, 0, 255)
+    # Ensuring the brightness shift is within the valid range [0, 255]
+    brightness = np.clip(brightness, -255, 255)
     
-    # Convert back to original data type
-    enhanced_img = img_bright_contrast.astype(np.uint8)
-    return enhanced_img
+    if brightness > 0:
+        shadow = brightness
+        highlight = 255
+    else:
+        shadow = 0
+        highlight = 255 + brightness
+    
+    alpha_b = (highlight - shadow) / 255
+    gamma_b = shadow
+    
+    # Adding the brightness value using the addWeighted function to prevent overflow
+    brightness_img = cv2.addWeighted(image, alpha_b, image, 0, gamma_b)
+    return brightness_img
+
+def adjust_contrast(image, contrast=1.0):
+    if image is None:
+        raise ValueError("Invalid image provided for contrast adjustment.")
+    
+    # Ensuring the contrast factor is within a reasonable range
+    contrast = np.clip(contrast, 0.0, 3.0)  # 3.0 as an upper reasonable limit
+    
+    f = 131 * (contrast - 1) / 127 + 1  # Factor for adjusting contrast
+    alpha_c = f
+    gamma_c = 127 * (1 - f)
+    
+    # Scaling the pixel values using the addWeighted function to prevent overflow
+    contrast_img = cv2.addWeighted(image, alpha_c, image, 0, gamma_c)
+    return contrast_img
 
 if __name__ == "__main__":
-    img_path = 'image1.jpg'
+    img_path = r'C:\Users\PC\Desktop\Smart image enhancer\Smart-Image-Enhancer-Project\image1.jpg'
     image = cv2.imread(img_path)
 
-    # Enhancing the image
-    bright_contrast_img = adjust_brightness_contrast(image, brightness=30, contrast=50)
-    
-    
+    if image is not None:
+        
+        brightness_adjusted_img = adjust_brightness(image, brightness=30)
+
+        contrast_adjusted_img = adjust_contrast(brightness_adjusted_img, contrast=1.5)
+
+        # Saving the enhanced image
+        cv2.imwrite('enhanced_image.jpg', contrast_adjusted_img)
+        print("Enhanced successfully")
