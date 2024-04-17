@@ -62,7 +62,7 @@ def main():
     user_choice = input("Do you want to adjust brightness or contrast or sharpen? (Enter 'b' or 'c' or 's'): ").lower()
 
     if user_choice not in ['b', 'c', 's']:
-        print("Invalid choice. Please enter 'brightness' or 'contrast'.")
+        print("Invalid choice. Please enter 'b' or 'c' or 's' ")
         return
     
     if user_choice == 'b':
